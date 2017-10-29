@@ -51,7 +51,7 @@ class GardenRouter():
         message = bytes([device, 2, 0, 0])
         gpio.output(self.rs485_enable, 1)
         self.rs485.sendMsg(message)
-        time.sleep(0.0012)
+        time.sleep(float(self.config.get('serial', 'delay')))
         gpio.output(self.rs485_enable, 0)
         s = time.time()
         while True:
@@ -76,7 +76,7 @@ class GardenRouter():
         message = bytes([device, 0, pin, 0])
         gpio.output(self.rs485_enable, 1)
         self.rs485.sendMsg(message)
-        time.sleep(0.0012)
+        time.sleep(float(self.config.get('serial', 'delay')))
         gpio.output(self.rs485_enable, 0)
         s = time.time()
         while True:
@@ -102,7 +102,7 @@ class GardenRouter():
         message = bytes([device, 1, pin, value])
         gpio.output(self.rs485_enable, 1)
         self.rs485.sendMsg(message)
-        time.sleep(0.0012)
+        time.sleep(float(self.config.get('serial', 'delay')))
         gpio.output(self.rs485_enable, 0)
         s = time.time()
         while True:

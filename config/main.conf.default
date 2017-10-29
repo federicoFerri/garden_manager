@@ -16,6 +16,7 @@ name = Garden_Manager
 [serial]
 port = /dev/ttySx
 timeout = 1
+delay = 0.0012
 
 [devices]
 1 = 1,2,3,4
