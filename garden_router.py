@@ -5,7 +5,6 @@ from pyA20.gpio import gpio
 from pyA20.gpio import port
 import serial
 import struct
-import rs485
 import time
 
 class GardenRouter():
@@ -13,20 +12,29 @@ class GardenRouter():
         self.config = config
 
         self.relay = port.PA11
-        self.rs485_enable = port.PA12
 
         gpio.init()
         gpio.setcfg(self.relay, gpio.OUTPUT)
         gpio.output(self.relay, 1)
-        gpio.setcfg(self.rs485_enable, gpio.OUTPUT)
-        gpio.output(self.rs485_enable, 0)
 
-        serial_port = serial.Serial(self.config.get('serial', 'port'), baudrate=57600, timeout=0)
-        self.rs485 = rs485.SerialWrapper(serial_port)
+        self.delay = self.config.getfloat('serial', 'delay')
+        baudrate = self.config.getint('serial', 'baudrate')
+        timeout = self.config.getint('serial', 'timeout')
+        self.conn = serial.Serial(self.config.get('serial', 'port'), baudrate=baudrate, timeout=timeout)
 
+        max_pin = []
+        min_pin = []
         self.devices = {}
         for device, pins in self.config.items('devices'):
             self.devices[int(device)] = list(map(int, pins.split(',')))
+            max_pin.append(max(self.devices[int(device)]))
+            min_pin.append(min(self.devices[int(device)]))
+
+        self.scan_list = []
+        for pin in range(min(min_pin), max(max_pin) + 1):
+            for device, pins in self.devices.items():
+                if pin in pins:
+                    self.scan_list.append((device, pin))
 
         self.enabled = False
 
@@ -48,21 +56,17 @@ class GardenRouter():
         device = int(device)
         if not device in self.devices:
             return {'success': False, 'error': 'Invalid device'}
-        message = bytes([device, 2, 0, 0])
-        gpio.output(self.rs485_enable, 1)
-        self.rs485.sendMsg(message)
-        time.sleep(float(self.config.get('serial', 'delay')))
-        gpio.output(self.rs485_enable, 0)
+        time.sleep(self.delay)
         s = time.time()
-        while True:
-            if self.rs485.update():
-                packet = self.rs485.getPacket()
-                data = struct.unpack('3B',packet)
-                if data[0:2] == (0,1):
-                    return {'success': True, 'data': None}
-                return {'success': False, 'error': 'Invalid response from device'}
-            if time.time() - s > int(self.config.get('serial', 'timeout')):
-                return {'success': False, 'error': 'Device not responding, timeout'}
+        message = bytes([device, 2, 0, 0])
+        self.conn.write(message)
+        response = self.conn.read(size=3)
+        if response == b'':
+            return {'success': False, 'error': 'Device not responding, timeout'}
+        data = struct.unpack('3B',response)
+        if data[0:2] == (0,1):
+            return {'success': True, 'data': {'time': time.time() - s}}
+        return {'success': False, 'error': 'Invalid response from device'}
 
     def read(self, device, pin):
         if not self.enabled:
@@ -73,19 +77,14 @@ class GardenRouter():
             return {'success': False, 'error': 'Invalid device'}
         if not pin in self.devices[device]:
             return {'success': False, 'error': 'Invalid device pin'}
+        time.sleep(self.delay)
         message = bytes([device, 0, pin, 0])
-        gpio.output(self.rs485_enable, 1)
-        self.rs485.sendMsg(message)
-        time.sleep(float(self.config.get('serial', 'delay')))
-        gpio.output(self.rs485_enable, 0)
-        s = time.time()
-        while True:
-            if self.rs485.update():
-                packet = self.rs485.getPacket()
-                data = struct.unpack('3B',packet)
-                return {'success': True, 'data': (data[1] << 8) + data[2]}
-            if time.time() - s > int(self.config.get('serial', 'timeout')):
-                return {'success': False, 'error': 'Device not responding, timeout'}
+        self.conn.write(message)
+        response = self.conn.read(size=3)
+        if response == b'':
+            return {'success': False, 'error': 'Device not responding, timeout'}
+        data = struct.unpack('3B',response)
+        return {'success': True, 'data': (data[1] << 8) + data[2]}
 
     def write(self, device, pin, value):
         if not self.enabled:
@@ -99,18 +98,13 @@ class GardenRouter():
             return {'success': False, 'error': 'Invalid device pin, out of byte range'}
         if not value in range(0,256):
             return {'success': False, 'error': 'Invalid value, out of byte range'}
+        time.sleep(self.delay)
         message = bytes([device, 1, pin, value])
-        gpio.output(self.rs485_enable, 1)
-        self.rs485.sendMsg(message)
-        time.sleep(float(self.config.get('serial', 'delay')))
-        gpio.output(self.rs485_enable, 0)
-        s = time.time()
-        while True:
-            if self.rs485.update():
-                packet = self.rs485.getPacket()
-                data = struct.unpack('3B', packet)
-                if data[0:2] == (0,1):
-                    return {'success': True, 'data': None}
-                return {'success': False, 'error': 'Invalid response from device, pin is not valid'}
-            if time.time() - s > int(self.config.get('serial', 'timeout')):
-                return {'success': False, 'error': 'Device not responding, timeout'}
+        self.conn.write(message)
+        response = self.conn.read(size=3)
+        if response == b'':
+            return {'success': False, 'error': 'Device not responding, timeout'}
+        data = struct.unpack('3B', response)
+        if data[0:2] == (0,1):
+            return {'success': True, 'data': None}
+        return {'success': False, 'error': 'Invalid response from device, pin is not valid'}

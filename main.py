@@ -67,7 +67,7 @@ class CustomServerHandler(http.server.BaseHTTPRequestHandler):
         getvars = parse_qs(urlparse(self.path).query)
         return getvars
 
-class CustomHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+class CustomHTTPServer(http.server.HTTPServer):
     key = ''
 
     def __init__(self, address, handlerClass=CustomServerHandler):
@@ -88,9 +88,6 @@ def start_webserver():
     server.serve_forever()
 
 if __name__ == '__main__':
-    if not os.getegid() == 0:
-        sys.exit('Must be run as root')
-
     fileConfig(config.get('logging', 'file'))
     logger = logging.getLogger('main')
     logger.info('Starting application')
