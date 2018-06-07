@@ -8,11 +8,18 @@ class Serve(object):
     def __init__(self, config):
         self.config = config
         self.garden_router = garden_router.GardenRouter(config)
+        self.users = 0
 
-    def enable(self, getvars):
+    def alloc(self, getvars):
+        self.users += 1
+        if self.users > 1:
+            return {'success': True, 'data': None}
         return self.garden_router.enable()
 
-    def disable(self, getvars):
+    def free(self, getvars):
+        self.users -= 1
+        if self.users > 0:
+            return {'success': True, 'data': None}
         return self.garden_router.disable()
 
     def ping(self, getvars):
