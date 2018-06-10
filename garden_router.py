@@ -60,10 +60,10 @@ class GardenRouter():
         s = time.time()
         message = bytes([device, 2, 0, 0])
         self.conn.write(message)
-        response = self.conn.read(size=3)
+        response = self.conn.read(size=5)
         if response == b'':
             return {'success': False, 'error': 'Device not responding, timeout'}
-        data = struct.unpack('3B',response)
+        data = struct.unpack('5B',response)
         if data[0:2] == (0,1):
             return {'success': True, 'data': {'time': time.time() - s}}
         return {'success': False, 'error': 'Invalid response from device'}
@@ -80,10 +80,10 @@ class GardenRouter():
         time.sleep(self.delay)
         message = bytes([device, 0, pin, 0])
         self.conn.write(message)
-        response = self.conn.read(size=3)
+        response = self.conn.read(size=5)
         if response == b'':
             return {'success': False, 'error': 'Device not responding, timeout'}
-        data = struct.unpack('3B',response)
+        data = struct.unpack('5B',response)
         return {'success': True, 'data': (data[1] << 8) + data[2]}
 
     def write(self, device, pin, value):
@@ -101,10 +101,10 @@ class GardenRouter():
         time.sleep(self.delay)
         message = bytes([device, 1, pin, value])
         self.conn.write(message)
-        response = self.conn.read(size=3)
+        response = self.conn.read(size=5)
         if response == b'':
             return {'success': False, 'error': 'Device not responding, timeout'}
-        data = struct.unpack('3B', response)
+        data = struct.unpack('5B', response)
         if data[0:2] == (0,1):
             return {'success': True, 'data': None}
         return {'success': False, 'error': 'Invalid response from device, pin is not valid'}
