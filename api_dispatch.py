@@ -29,8 +29,8 @@ class Serve(object):
 
     def ping_all(self, getvars):
         data = {}
-        for device in self.garden_router.devices:
-            data[device] = self.garden_router.ping(device).get('data', None)
+        for device in self.garden_router.get_ping_all_list():
+            data[self.garden_router.get_device_name(device)] = self.garden_router.ping(device).get('data', None)
         return {'success': True, 'data': data}
 
     def read(self, getvars):
@@ -42,10 +42,11 @@ class Serve(object):
 
     def read_all(self, getvars):
         data = {}
-        for device, pin in self.garden_router.scan_list:
-            if device not in data:
-                data[device] = {}
-            data[device][pin] = self.garden_router.read(device, pin).get('data', None)
+        for device, pin in self.garden_router.get_read_all_list():
+            device_name = self.garden_router.get_device_name(device)
+            if device_name not in data:
+                data[device_name] = {}
+            data[device_name][self.garden_router.get_pin_name(device, pin)] = self.garden_router.read(device, pin).get('data', None)
         return {'success': True, 'data': data}
 
     def write(self, getvars):
@@ -56,9 +57,3 @@ class Serve(object):
         if 'value' not in getvars.keys():
             return {'success': False, 'error': 'Query string must contain value field'}
         return self.garden_router.write(getvars['device'][0], getvars['pin'][0], getvars['value'][0])
-
-    def devices(self, getvars):
-        return {'success': True, 'data': self.garden_router.devices}
-
-    def scan_list(self, getvars):
-        return {'success': True, 'data': self.garden_router.scan_list}

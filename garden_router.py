@@ -5,6 +5,7 @@ from pyA20.gpio import gpio
 from pyA20.gpio import port
 import serial
 import struct
+import json
 import time
 
 class GardenRouter():
@@ -22,21 +23,52 @@ class GardenRouter():
         timeout = self.config.getint('serial', 'timeout')
         self.conn = serial.Serial(self.config.get('serial', 'port'), baudrate=baudrate, timeout=timeout)
 
-        max_pin = []
-        min_pin = []
-        self.devices = {}
-        for device, pins in self.config.items('devices'):
-            self.devices[int(device)] = list(map(int, pins.split(',')))
-            max_pin.append(max(self.devices[int(device)]))
-            min_pin.append(min(self.devices[int(device)]))
+        with open(self.config.get('devices', 'file')) as f:
+            self.devices_data = json.load(f)
 
+        all_pins = []
+        for device, pins in self.devices.items():
+            all_pins += pins
         self.scan_list = []
-        for pin in range(min(min_pin), max(max_pin) + 1):
+        for pin in range(min(all_pins), max(all_pins) + 1):
             for device, pins in self.devices.items():
                 if pin in pins:
-                    self.scan_list.append((device, pin))
+                    self.scan_list.append((device, pin, self.data_types[device][pin]))
 
         self.enabled = False
+
+    def _is_device_valid(self, device):
+        return any((True for device_data in self.devices_data if device_data['device'] == device))
+
+    def get_device_name(self, device):
+        return next((device_data['name'] for device_data in self.devices_data if device_data['device'] == device), None)
+
+    def _is_pin_valid(self, device, pin):
+        pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
+        return any((True for pin_data in pins_data if pin_data['device'] == pin))
+
+    def get_pin_name(self, device, pin):
+        pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
+        return next((pin_data['name'] for pin_data in pins_data if pin_data['device'] == pin), None)
+
+    def get_read_all_list(self):
+        scan_list = []
+        for device_data in self.devices_data:
+            scan_list += [(device_data['device'], pin_data['pin']) for pin_data in device_data['pins']]
+        return sorted(scan_list, key=lambda x: (x[1], x[0]))
+
+    def get_ping_all_list(self):
+        return [device_data['device'] for device_data in self.devices_data]
+
+    def _decode(self, device, pin, data):
+        pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
+        data_type = next((pin_data['data_type'] for pin_data in pins_data if pin_data['device'] == pin), None)
+        if data_type == '16bit_int':
+            return struct.unpack('H', data[1:3])
+        elif data_type == '32bit_float':
+            return struct.unpack('<f', data[1:5])
+        else:
+            return None
 
     def enable(self):
         gpio.output(self.relay, 0)
@@ -54,7 +86,7 @@ class GardenRouter():
         if not self.enabled:
             return {'success': False, 'error': 'You must enable it first'}
         device = int(device)
-        if not device in self.devices:
+        if not self._is_device_valid(device):
             return {'success': False, 'error': 'Invalid device'}
         time.sleep(self.delay)
         s = time.time()
@@ -73,9 +105,9 @@ class GardenRouter():
             return {'success': False, 'error': 'You must enable it first'}
         device = int(device)
         pin = int(pin)
-        if not device in self.devices:
+        if not self._is_device_valid(device):
             return {'success': False, 'error': 'Invalid device'}
-        if not pin in self.devices[device]:
+        if not self._is_pin_valid(device, pin):
             return {'success': False, 'error': 'Invalid device pin'}
         time.sleep(self.delay)
         message = bytes([device, 0, pin, 0])
@@ -83,8 +115,7 @@ class GardenRouter():
         response = self.conn.read(size=5)
         if response == b'':
             return {'success': False, 'error': 'Device not responding, timeout'}
-        data = struct.unpack('5B',response)
-        return {'success': True, 'data': (data[1] << 8) + data[2]}
+        return {'success': True, 'data': self._decode(device, pin, response)}
 
     def write(self, device, pin, value):
         if not self.enabled:
@@ -92,7 +123,7 @@ class GardenRouter():
         device = int(device)
         pin = int(pin)
         value = int(value)
-        if not device in self.devices:
+        if not self._is_device_valid(device):
             return {'success': False, 'error': 'Invalid device'}
         if not pin in range(0,256):
             return {'success': False, 'error': 'Invalid device pin, out of byte range'}

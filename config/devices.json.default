@@ -1,0 +1,157 @@
+[
+  {
+    "device": 1,
+    "name": "Device_1",
+    "pins": [
+      {
+        "pin": 1,
+        "name": "Pin_1",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 2,
+        "name": "Pin_2",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 3,
+        "name": "Pin_3",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 4,
+        "name": "Pin_4",
+        "data_type": "16bit_int"
+      }
+    ]
+  },
+  {
+    "device": 2,
+    "name": "Device_2",
+    "pins": [
+      {
+        "pin": 1,
+        "name": "Pin_1",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 2,
+        "name": "Pin_2",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 3,
+        "name": "Pin_3",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 4,
+        "name": "Pin_4",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 5,
+        "name": "Pin_5",
+        "data_type": "16bit_int"
+      }
+    ]
+  },
+  {
+    "device": 3,
+    "name": "Device_3",
+    "pins": [
+      {
+        "pin": 1,
+        "name": "Pin_1",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 2,
+        "name": "Pin_2",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 3,
+        "name": "Pin_3",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 4,
+        "name": "Pin_4",
+        "data_type": "16bit_int"
+      }
+    ]
+  },
+  {
+    "device": 4,
+    "name": "Device_4",
+    "pins": [
+      {
+        "pin": 0,
+        "name": "Pin_0",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 1,
+        "name": "Pin_1",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 2,
+        "name": "Pin_2",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 3,
+        "name": "Pin_3",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 4,
+        "name": "Pin_4",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 5,
+        "name": "Pin_5",
+        "data_type": "16bit_int"
+      }
+    ]
+  },
+  {
+    "device": 5,
+    "name": "Weather_Station",
+    "pins": [
+      {
+        "pin": 2,
+        "name": "Pressure",
+        "data_type": "32bit_float"
+      },
+      {
+        "pin": 3,
+        "name": "Humidity",
+        "data_type": "32bit_float"
+      },
+      {
+        "pin": 4,
+        "name": "Internal_Temperature",
+        "data_type": "32bit_float"
+      },
+      {
+        "pin": 5,
+        "name": "External_Temperature",
+        "data_type": "32bit_float"
+      },
+      {
+        "pin": 6,
+        "name": "Rain",
+        "data_type": "16bit_int"
+      },
+      {
+        "pin": 7,
+        "name": "Brightness",
+        "data_type": "16bit_int"
+      }
+    ]
+  }
+]
