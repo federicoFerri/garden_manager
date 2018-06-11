@@ -36,11 +36,11 @@ class GardenRouter():
 
     def _is_pin_valid(self, device, pin):
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
-        return any((True for pin_data in pins_data if pin_data['device'] == pin))
+        return any((True for pin_data in pins_data if pin_data['pin'] == pin))
 
     def get_pin_name(self, device, pin):
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
-        return next((pin_data['name'] for pin_data in pins_data if pin_data['device'] == pin), None)
+        return next((pin_data['name'] for pin_data in pins_data if pin_data['pin'] == pin), None)
 
     def get_read_all_list(self):
         scan_list = []
@@ -53,7 +53,7 @@ class GardenRouter():
 
     def _decode(self, device, pin, data):
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
-        data_type = next((pin_data['data_type'] for pin_data in pins_data if pin_data['device'] == pin), None)
+        data_type = next((pin_data['data_type'] for pin_data in pins_data if pin_data['pin'] == pin), None)
         if data_type == '16bit_int':
             return struct.unpack('H', data[1:3])
         elif data_type == '32bit_float':
