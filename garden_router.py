@@ -26,15 +26,6 @@ class GardenRouter():
         with open(self.config.get('devices', 'file')) as f:
             self.devices_data = json.load(f)
 
-        all_pins = []
-        for device, pins in self.devices.items():
-            all_pins += pins
-        self.scan_list = []
-        for pin in range(min(all_pins), max(all_pins) + 1):
-            for device, pins in self.devices.items():
-                if pin in pins:
-                    self.scan_list.append((device, pin, self.data_types[device][pin]))
-
         self.enabled = False
 
     def _is_device_valid(self, device):
