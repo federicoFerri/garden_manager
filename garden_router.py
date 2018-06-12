@@ -34,6 +34,9 @@ class GardenRouter():
     def get_device_name(self, device):
         return next((device_data['name'] for device_data in self.devices_data if device_data['device'] == device), None)
 
+    def get_device_number(self, device_name):
+        return next((device_data['device'] for device_data in self.devices_data if device_data['name'] == device_name), None)
+
     def _is_pin_valid(self, device, pin):
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
         return any((True for pin_data in pins_data if pin_data['pin'] == pin))
@@ -41,6 +44,10 @@ class GardenRouter():
     def get_pin_name(self, device, pin):
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
         return next((pin_data['name'] for pin_data in pins_data if pin_data['pin'] == pin), None)
+
+    def get_pin_number(self, device, pin_name):
+        pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
+        return next((pin_data['pin'] for pin_data in pins_data if pin_data['name'] == pin_name), None)
 
     def get_read_all_list(self):
         scan_list = []
@@ -94,8 +101,18 @@ class GardenRouter():
     def read(self, device, pin):
         if not self.enabled:
             return {'success': False, 'error': 'You must enable it first'}
-        device = int(device)
-        pin = int(pin)
+        try:
+            device = int(device)
+            if not self._is_device_valid(device):
+                raise ValueError
+        except ValueError:
+            device = self.get_device_number(device)
+        try:
+            pin = int(pin)
+            if not self._is_pin_valid(device, pin):
+                raise ValueError
+        except ValueError:
+            pin = self.get_pin_number(device, pin)
         if not self._is_device_valid(device):
             return {'success': False, 'error': 'Invalid device'}
         if not self._is_pin_valid(device, pin):
