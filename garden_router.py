@@ -55,9 +55,9 @@ class GardenRouter():
         pins_data = next((device_data['pins'] for device_data in self.devices_data if device_data['device'] == device), [])
         data_type = next((pin_data['data_type'] for pin_data in pins_data if pin_data['pin'] == pin), None)
         if data_type == '16bit_int':
-            return struct.unpack('H', data[1:3])
+            return int.from_bytes(data[1:3], byteorder='big')
         elif data_type == '32bit_float':
-            return struct.unpack('<f', data[1:5])
+            return struct.unpack('<f', data[1:5])[0]
         else:
             return None
 
@@ -81,7 +81,7 @@ class GardenRouter():
             return {'success': False, 'error': 'Invalid device'}
         time.sleep(self.delay)
         s = time.time()
-        message = bytes([device, 2, 0, 0])
+        message = bytes([device, 2, 0, 0, 0])
         self.conn.write(message)
         response = self.conn.read(size=5)
         if response == b'':
@@ -101,7 +101,7 @@ class GardenRouter():
         if not self._is_pin_valid(device, pin):
             return {'success': False, 'error': 'Invalid device pin'}
         time.sleep(self.delay)
-        message = bytes([device, 0, pin, 0])
+        message = bytes([device, 0, pin, 0, 0])
         self.conn.write(message)
         response = self.conn.read(size=5)
         if response == b'':
@@ -121,7 +121,7 @@ class GardenRouter():
         if not value in range(0,256):
             return {'success': False, 'error': 'Invalid value, out of byte range'}
         time.sleep(self.delay)
-        message = bytes([device, 1, pin, value])
+        message = bytes([device, 1, pin, value, 0])
         self.conn.write(message)
         response = self.conn.read(size=5)
         if response == b'':
