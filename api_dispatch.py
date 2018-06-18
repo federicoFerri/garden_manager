@@ -17,10 +17,16 @@ class Serve(object):
         return self.garden_router.enable()
 
     def free(self, getvars):
-        self.users -= 1
         if self.users > 0:
-            return {'success': True, 'data': None}
-        return self.garden_router.disable()
+            self.users -= 1
+            if self.users > 0:
+                return {'success': True, 'data': None}
+            return self.garden_router.disable()
+        else:
+            return {'success': False, 'error': 'No users connected'}
+
+    def connected_users(self, getvars):
+        return {'success': True, 'data': self.users}
 
     def ping(self, getvars):
         if 'device' not in getvars.keys():
