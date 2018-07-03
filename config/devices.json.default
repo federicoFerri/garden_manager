@@ -153,5 +153,27 @@
         "data_type": "16bit_int"
       }
     ]
+  },
+  {
+    "device": 6,
+    "name": "Primary_Pump",
+    "pins": [
+      {
+        "pin": 0,
+        "name": "Distance",
+        "data_type": "32bit_float"
+      }
+    ]
+  },
+  {
+    "device": 7,
+    "name": "Secondary_Pump",
+    "pins": [
+      {
+        "pin": 0,
+        "name": "Distance",
+        "data_type": "32bit_float"
+      }
+    ]
   }
 ]

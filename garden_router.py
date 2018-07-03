@@ -125,20 +125,26 @@ class GardenRouter():
             return {'success': False, 'error': 'Device not responding, timeout'}
         return {'success': True, 'data': self._decode(device, pin, response)}
 
-    def write(self, device, pin, value):
+    def write(self, device, pin, value, buzzer):
         if not self.enabled:
             return {'success': False, 'error': 'You must enable it first'}
         device = int(device)
         pin = int(pin)
         value = int(value)
+        buzzer = buzzer.lower() in ("true", "1")
         if not self._is_device_valid(device):
             return {'success': False, 'error': 'Invalid device'}
         if not pin in range(0,256):
             return {'success': False, 'error': 'Invalid device pin, out of byte range'}
-        if not value in range(0,256):
+        if not buzzer and not value in range(0,256):
             return {'success': False, 'error': 'Invalid value, out of byte range'}
+        if buzzer and not value in range(0,65536):
+            return {'success': False, 'error': 'Invalid value, out of ushort range'}
         time.sleep(self.delay)
-        message = bytes([device, 1, pin, value, 0])
+        if buzzer:
+            message = bytes([device, 1, pin]) + value.to_bytes(2, byteorder='big')
+        else:
+            message = bytes([device, 1, pin, value, 0])
         self.conn.write(message)
         response = self.conn.read(size=5)
         if response == b'':

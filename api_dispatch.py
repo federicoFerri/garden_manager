@@ -62,4 +62,5 @@ class Serve(object):
             return {'success': False, 'error': 'Query string must contain pin field'}
         if 'value' not in getvars.keys():
             return {'success': False, 'error': 'Query string must contain value field'}
-        return self.garden_router.write(getvars['device'][0], getvars['pin'][0], getvars['value'][0])
+        buzzer = getvars['buzzer'][0] if 'buzzer' in getvars.keys() else 'false'
+        return self.garden_router.write(getvars['device'][0], getvars['pin'][0], getvars['value'][0], buzzer)
