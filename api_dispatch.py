@@ -28,7 +28,7 @@ class Serve(object):
     def get_device_name(self, getvars):
         if 'device' not in getvars.keys():
             return {'success': False, 'error': 'Query string must contain device field'}
-        return {'success': True, 'data': self.get_device_name(getvars['device'][0])}
+        return {'success': True, 'data': self.garden_router.get_device_name(getvars['device'][0])}
 
     def connected_users(self, getvars):
         return {'success': True, 'data': self.users}
