@@ -162,6 +162,16 @@
         "pin": 0,
         "name": "Distance",
         "data_type": "32bit_float"
+      },
+      {
+        "pin": 15,
+        "name": "Level_sensor_1",
+        "data_type": "bool"
+      },
+      {
+        "pin": 17,
+        "name": "Level_sensor_2",
+        "data_type": "bool"
       }
     ]
   },
@@ -173,6 +183,16 @@
         "pin": 0,
         "name": "Distance",
         "data_type": "32bit_float"
+      },
+      {
+        "pin": 16,
+        "name": "Level_sensor_1",
+        "data_type": "bool"
+      },
+      {
+        "pin": 17,
+        "name": "Level_sensor_2",
+        "data_type": "bool"
       }
     ]
   }

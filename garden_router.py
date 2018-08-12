@@ -63,6 +63,8 @@ class GardenRouter():
         data_type = next((pin_data['data_type'] for pin_data in pins_data if pin_data['pin'] == pin), None)
         if data_type == '16bit_int':
             return int.from_bytes(data[1:3], byteorder='big')
+        if data_type == 'bool':
+            return bool(int(data[1]))
         elif data_type == '32bit_float':
             return struct.unpack('<f', data[1:5])[0]
         else:
