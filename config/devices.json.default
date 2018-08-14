@@ -166,12 +166,12 @@
       {
         "pin": 15,
         "name": "Underflow",
-        "data_type": "reversed_bool"
+        "data_type": "bool"
       },
       {
         "pin": 17,
         "name": "Overflow",
-        "data_type": "reversed_bool"
+        "data_type": "bool"
       }
     ]
   },
@@ -187,12 +187,12 @@
       {
         "pin": 16,
         "name": "Overflow",
-        "data_type": "reversed_bool"
+        "data_type": "bool"
       },
       {
         "pin": 17,
         "name": "Underflow",
-        "data_type": "reversed_bool"
+        "data_type": "bool"
       }
     ]
   }
