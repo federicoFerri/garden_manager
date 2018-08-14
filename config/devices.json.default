@@ -165,13 +165,13 @@
       },
       {
         "pin": 15,
-        "name": "Level_sensor_1",
-        "data_type": "bool"
+        "name": "Underflow",
+        "data_type": "reversed_bool"
       },
       {
         "pin": 17,
-        "name": "Level_sensor_2",
-        "data_type": "bool"
+        "name": "Overflow",
+        "data_type": "reversed_bool"
       }
     ]
   },
@@ -186,13 +186,13 @@
       },
       {
         "pin": 16,
-        "name": "Level_sensor_1",
-        "data_type": "bool"
+        "name": "Overflow",
+        "data_type": "reversed_bool"
       },
       {
         "pin": 17,
-        "name": "Level_sensor_2",
-        "data_type": "bool"
+        "name": "Underflow",
+        "data_type": "reversed_bool"
       }
     ]
   }
