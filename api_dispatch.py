@@ -13,7 +13,7 @@ class Serve(object):
     def alloc(self, getvars):
         if 'tag' not in getvars.keys():
             return {'success': False, 'error': 'Query string must contain tag field'}
-        self.users.append(tag)
+        self.users.append(getvars['tag'][0])
         if len(self.users) > 1:
             return {'success': True, 'data': None}
         return self.garden_router.enable()
@@ -23,7 +23,7 @@ class Serve(object):
             return {'success': False, 'error': 'Query string must contain tag field'}
         if len(self.users) > 0:
             try:
-                self.users.remove(tag)
+                self.users.remove(getvars['tag'][0])
             except:
                 return {'success': False, 'error': 'No tags found'}
             if len(self.users) > 0:
