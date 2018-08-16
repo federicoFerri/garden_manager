@@ -8,18 +8,25 @@ class Serve(object):
     def __init__(self, config):
         self.config = config
         self.garden_router = garden_router.GardenRouter(config)
-        self.users = 0
+        self.users = []
 
     def alloc(self, getvars):
-        self.users += 1
-        if self.users > 1:
+        if 'tag' not in getvars.keys():
+            return {'success': False, 'error': 'Query string must contain tag field'}
+        self.users.append(tag)
+        if len(self.users) > 1:
             return {'success': True, 'data': None}
         return self.garden_router.enable()
 
     def free(self, getvars):
-        if self.users > 0:
-            self.users -= 1
-            if self.users > 0:
+        if 'tag' not in getvars.keys():
+            return {'success': False, 'error': 'Query string must contain tag field'}
+        if len(self.users) > 0:
+            try:
+                self.users.remove(tag)
+            except:
+                return {'success': False, 'error': 'No tags found'}
+            if len(self.users) > 0:
                 return {'success': True, 'data': None}
             return self.garden_router.disable()
         else:
