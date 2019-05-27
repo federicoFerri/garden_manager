@@ -13,10 +13,13 @@ class GardenRouter():
         self.config = config
 
         self.relay = port.PA11
+        self.arduino_reset = port.PA12
 
         gpio.init()
         gpio.setcfg(self.relay, gpio.OUTPUT)
         gpio.output(self.relay, 1)
+        gpio.setcfg(self.arduino_reset, gpio.OUTPUT)
+        gpio.output(self.arduino_reset, 1)
 
         self.delay = self.config.getfloat('serial', 'delay')
         baudrate = self.config.getint('serial', 'baudrate')
@@ -71,6 +74,11 @@ class GardenRouter():
             return None
 
     def enable(self):
+        # reset arduino first
+        gpio.output(self.arduino_reset, 0)
+        time.sleep(0.01)
+        gpio.output(self.arduino_reset, 1)
+        # start normal operations
         gpio.output(self.relay, 0)
         time.sleep(1)
         self.enabled = True
